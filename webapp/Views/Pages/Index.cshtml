@@ -1,0 +1,59 @@
+@model IEnumerable<FriendsAppNoORM.Models.Page>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h4>Pages</h4>
+
+<p>
+    <a asp-action="Create"><button class="btn btn-primary">Create New Page</button></a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Url)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Content)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ChangedOn)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>                    
+                     <a asp-controller="Pages" asp-action="View" asp-route-profileId="@item.Profile.Id" asp-route-pageUrl="@item.Url">@item.Url</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Content)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ChangedOn)
+                </td>
+                <td>
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@item.PageId"><button class="btn btn-success">Edit</button></a>
+
+                            <form asp-action="Delete" method="POST" asp-controller="Pages">
+                                <input type="hidden" value="@item.PageId" id="id" name="id" />
+                                <input type="submit" value="Delete" class="btn btn-danger" />
+                            </form>                      
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,98 @@
+@* @model IEnumerable<FriendsAppNoORM.Models.Profile> *@
+@model FriendsAppNoORM.ProfilePaginatedListViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+<h4>Find a new Friend</h4>
+<form asp-controller="Profile" asp-action="FindFriend" method="GET">
+    <div class="row">
+        <div class="col">
+            <input type="text" name="fnf" value="@Model.FirstNameFilter" class="form-control"
+                placeholder="First name" />
+        </div>
+        <div class="col">
+            <input type="text" name="lnf" value="@Model.LastNameFilter" class="form-control" placeholder="Last name" />
+        </div>
+        <div  class="col">
+        <input type="submit" value="Filter" class="btn btn-primary" /> </div>
+        <div  class="col"></div> 
+        <div>
+
+</form>
+<div class="d-flex justify-content-end">
+
+    <label>Page @(Model.PageIndex+1) of @Model.TotalPages</label>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model[0].FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Age)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Gender)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].City)
+            </th>
+            <th style="width: 25%;">
+                @Html.DisplayNameFor(model => model[0].Interests)
+            </th>
+            <th style="width: 200px;">
+                @if (@Model.HasPreviousPage)
+                {
+                    <a asp-action="FindFriend" asp-route-pi="@(Model.PageIndex - 1)" asp-route-ps="@Model.PageSize"
+                    asp-route-lnf="@Model.LastNameFilter" asp-route-fnf="@Model.FirstNameFilter"
+                    class="btn btn-secondary"> Previous
+                    </a>
+                }
+                @if (@Model.HasNextPage)
+                {
+                    <a asp-action="FindFriend" asp-route-pi="@(Model.PageIndex + 1)" asp-route-ps="@Model.PageSize"
+                    asp-route-lnf="@Model.LastNameFilter" asp-route-fnf="@Model.FirstNameFilter"
+                    class="btn btn-secondary">
+                        Next
+                    </a>
+                }
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-controller="Profile" asp-action="Details" asp-route-id="@item.ProfileId">@item.FirstName</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Age)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.City)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Interests)
+                </td>
+                <td>
+                    <form asp-action="SendRequest" method="POST" asp-controller="Friendship">
+                        <input type="hidden" value="@item.ProfileId" id="to" name="to" />
+                        <input type="submit" value="+ Add Friend" class="btn btn-success" />
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

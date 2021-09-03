@@ -1,0 +1,34 @@
+﻿@model System.String;
+
+@{
+    ViewData["Title"] = "FriendsApp dotnet core no orm";
+}
+
+@if (!User.Identity.IsAuthenticated)
+{
+    <div class="text-center">
+
+
+        <p>
+            <a asp-controller="Account" asp-action="Register">Register as a new user</a>. 
+            If you are already a member? <a asp-controller="Account" asp-action="Login">Login</a>
+        </p>
+        <p>
+            
+        </p>
+
+    </div>
+}
+else
+{
+  @if(!String.IsNullOrEmpty(Model)){
+
+<br/>
+<hr/>
+<span>@Model</span>
+<br/>
+<hr/>
+
+       <a href="##" onClick="history.go(-1); return false;"><button class="btn btn-primary">Back</button></a> 
+  }   
+}

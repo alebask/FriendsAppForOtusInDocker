@@ -1,0 +1,27 @@
+@model FriendsAppNoORM.Models.Page
+@using FriendsAppNoORM.Utilities;
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div>
+
+    <h2>@Html.DisplayFor(model => model.Title)</h2>
+<hr/>
+    <div class="h5 text-justify p-3">@Html.DisplayFor(model => model.Content)</div>
+    <hr/>
+    <p class="font-italic">Published on @Html.DisplayFor(model => model.ChangedOn) by <a asp-controller="Profile" asp-action="Details" asp-route-id="@Model.Profile.Id"> @Model.Profile.Name </a></p>
+
+
+</div>
+<div>
+    @if(Model.Profile.Id == Context.Request.HttpContext.User.GetMyProfileId()){
+    <a asp-action="Edit" asp-route-id="@Model.PageId">Edit</a> <span> | </span>
+    <a asp-action="Index">Back to List</a>
+    }
+    else
+    {
+        <a href="##" onClick="history.go(-1); return false;">back</a>
+    }
+    
+</div>

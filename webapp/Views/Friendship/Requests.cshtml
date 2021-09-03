@@ -1,0 +1,83 @@
+@model IEnumerable<FriendsAppNoORM.Models.Friendship>
+@using FriendsAppNoORM.Utilities
+
+@{
+    ViewData["Title"] = "Friend Requests";
+}
+@{
+    long myProfileId = Context.Request.HttpContext.User.GetMyProfileId();
+}
+<h4>Friend Requests</h4>
+
+@if (Model.Count() > 0)
+{
+
+    <table class="table">
+    <thead>
+        <tr>
+            <th>
+                From
+            </th>
+            <th>
+                To
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Status
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model.OrderByDescending(m => m.ChangedOn))
+            {
+                <tr>
+                    <td>
+
+                        <a asp-action="Details" asp-controller="Profile" asp-route-id="@item.RequestedBy.Id">
+                            @Html.DisplayFor(modelItem => item.RequestedBy.Name)
+                        </a>
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-controller="Profile" asp-route-id="@item.RequestedTo.Id">
+                            @Html.DisplayFor(modelItem => item.RequestedTo.Name)
+                        </a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ChangedOn)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @if (item.RequestedTo.Id == myProfileId)
+                        {                            
+                            <form asp-action="AcceptRequest" method="POST" asp-controller="Friendship">
+                                <input type="hidden" value="@item.RequestedBy.Id" id="by" name="by"/>
+                                <input type="submit" value="Accept" class="btn btn-success" />                                
+                            </form>                            
+                            <form asp-action="DeclineRequest" method="POST" asp-controller="Friendship">
+                                <input type="hidden" value="@item.RequestedBy.Id" id="by" name="by"/>
+                                <input type="submit" value="Decline" class="btn btn-danger" />                                
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="RevokeRequest" method="POST" asp-controller="Friendship">
+                                <input type="hidden" value="@item.RequestedTo.Id" id="to" name="to"/>
+                                <input type="submit" value="Revoke" class="btn btn-danger" />                                
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <span>No pending friend requests</span>
+}

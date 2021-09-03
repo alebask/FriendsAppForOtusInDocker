@@ -1,0 +1,55 @@
+@model IEnumerable<FriendsAppNoORM.Models.Friendship>
+@using FriendsAppNoORM.Utilities;
+@{
+    ViewData["Title"] = "Friends";
+}
+@{
+    long myProfileId = Context.Request.HttpContext.User.GetMyProfileId();
+}
+<h4>Friends</h4>
+@if (Model.Count() > 0)
+{
+    <table class="table">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Friend since
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+            {
+                var friendId = (item.RequestedBy.Id == myProfileId) ? item.RequestedTo.Id : item.RequestedBy.Id;
+                
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-controller="Profile" asp-route-id="@friendId">
+                            @Html.DisplayFor(modelItem => item.RequestedBy.Name)
+                        </a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ChangedOn)
+                    </td>
+
+                    <td>
+                        
+                        <form asp-action="Delete" method="POST" asp-controller="Friendship">
+                            <input type="hidden" value="@friendId" id="id" name="id" />
+                            <input type="submit" value="Unfriend" class="btn btn-danger" />
+                        </form>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <span>You have no friends</span>
+}

@@ -1,0 +1,64 @@
+@using FriendsAppNoORM.Utilities
+@model FriendsAppNoORM.Models.Profile
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+@{ long myProfileId = Context.Request.HttpContext.User.GetMyProfileId();}
+<div>
+    <h4>Profile</h4>
+    <hr />
+    <dl lass="row">
+        
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Age)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Age)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Gender)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Gender)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.City)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.City)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Interests)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Interests);
+        </dd>       
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ChangedOn)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ChangedOn)
+        </dd>
+    </dl>
+</div>
+<div>
+    
+    @if(Model.ProfileId == myProfileId){             
+        <a asp-action="Edit" asp-route-id="@Model.ProfileId"><button class="btn btn-primary">Edit</button></a>
+    }
+    <a href="##" onClick="history.go(-1); return false;"><button class="btn btn-primary">Back</button></a> 
+</div>

@@ -1,0 +1,53 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP .NET Core service.
+
+version: '3.7'
+
+services:
+
+  webapp:
+    image: webapp
+    container_name: webapp
+    build:
+      dockerfile: ./webapp/Dockerfile
+    ports:
+      - 5000:5000
+    environment:
+      - ConnectionStrings:MySqlConnection=server=friendsdb;port=3306;database=friendsdb;uid=root;password=root;
+    depends_on: 
+      - friendsdb
+    networks:
+      - otus-network
+
+
+  data_generator:
+    image: data_generator
+    container_name: data_generator
+    build:
+      dockerfile: ./data_generator/Dockerfile    
+    environment:
+      - ConnectionStrings:MySqlConnection=server=friendsdb;port=3306;database=friendsdb;uid=root;password=root;
+      - NumberOfProfilesToGenerate=1000000
+    depends_on: 
+      - friendsdb
+    networks:
+      - otus-network
+
+  friendsdb:
+    image: friendsdb
+    container_name: friendsdb
+    build:
+      dockerfile: ./friendsdb/Dockerfile
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:  
+      - friendsdb_volume:/var/lib/mysql/:delegated
+    ports:
+      - 3306:3306
+    networks:
+      - otus-network
+
+volumes:
+ friendsdb_volume:
+ 
+networks:
+  otus-network:
