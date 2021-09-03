@@ -12,7 +12,7 @@ services:
     ports:
       - 5000:5000
     environment:
-      - ConnectionStrings:MySqlConnection=server=friendsdb;port=3306;database=friendsdb;uid=root;password=root;
+      - ConnectionStrings:MySqlConnection=server=friendsdb;database=friendsdb;uid=root;password=root;
     depends_on: 
       - friendsdb
     networks:
@@ -25,8 +25,9 @@ services:
     build:
       dockerfile: ./data_generator/Dockerfile    
     environment:
-      - ConnectionStrings:MySqlConnection=server=friendsdb;port=3306;database=friendsdb;uid=root;password=root;
+      - ConnectionStrings:MySqlConnection=server=friendsdb;database=friendsdb;uid=root;password=root;
       - NumberOfProfilesToGenerate=1000000
+      - WaitDatabaseReadyInSeconds=30
     depends_on: 
       - friendsdb
     networks:
@@ -39,10 +40,9 @@ services:
       dockerfile: ./friendsdb/Dockerfile
     environment:
       - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=friendsdb
     volumes:  
       - friendsdb_volume:/var/lib/mysql/:delegated
-    ports:
-      - 3306:3306
     networks:
       - otus-network
 

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FriendsAppNoORM.Data;
@@ -21,14 +22,16 @@ namespace FriendsAppDataGenerator{
        public class DataGenerator: IDataGenerator{
 
         private string _mySqlConnectionString;
-        private int _profilesToGenerate;
+        private int _targetProfilesNumber = 1000000;
+        private int _waitDatabaseReadyInSeconds = 60;
 
         private static Random random = new Random();
 
         public DataGenerator(IConfiguration configuration){
 
             _mySqlConnectionString = configuration.GetConnectionString("MySqlConnection");            
-            _profilesToGenerate = configuration.GetValue<int>("NumberOfProfilesToGenerate");
+            _targetProfilesNumber = configuration.GetValue<int>("NumberOfProfilesToGenerate");
+            _waitDatabaseReadyInSeconds = configuration.GetValue<int>("WaitDatabaseReadyInSeconds");
         }
 
         public void Run()
@@ -46,17 +49,30 @@ namespace FriendsAppDataGenerator{
             ProfileDataSet profileDataSet = new ProfileDataSet(_mySqlConnectionString);
             AccountDataSet accountDataSet = new AccountDataSet(_mySqlConnectionString);
 
-            long length = _profilesToGenerate - accountDataSet.Count();
+            //one retry with some delay due db is slow to start for the first time
+            long currentProfilesNumber = 0;
+            try{
+               currentProfilesNumber = accountDataSet.Count();
+            }
+            catch(MySqlException ex){
+                Console.WriteLine($"Error accessing database {ex.Message}");
+                Console.WriteLine($"Retry in {_waitDatabaseReadyInSeconds} seconds");
+                Thread.Sleep(1000 * _waitDatabaseReadyInSeconds);
 
-            Console.Write($"Generating {length} random profiles...");
+                currentProfilesNumber = accountDataSet.Count();
+            }
 
-            List<Profile> profiles = new List<Profile>(_profilesToGenerate);
+            long count = _targetProfilesNumber - currentProfilesNumber;
+
+            Console.Write($"Generating {count} random profiles...");
+
+            List<Profile> profiles = new List<Profile>(_targetProfilesNumber);
 
             string[] femaleLastNameEndings = { "ова", "ева", "ина", "ая" };
             string[] maleLastNameEndings = { "ов", "ев", "ин", "ий" };
 
 
-            for (var i = 0; i < length; i++)
+            for (var i = 0; i < count; i++)
             {
                 FirstNameRecord fnRecord = firstNames[random.Next(0, firstNames.Count)];
                 LastNameRecord lnRecord = lastNames[random.Next(0, lastNames.Count)];
@@ -134,7 +150,7 @@ namespace FriendsAppDataGenerator{
 
             Console.WriteLine("\nDONE");
 
-            Console.WriteLine($"{_profilesToGenerate} number of profiles generated");
+            Console.WriteLine($"{_targetProfilesNumber} number of profiles generated");
         }
 
         private Guid CreateAccount(AccountDataSet accountDataSet, string passwordHash)
