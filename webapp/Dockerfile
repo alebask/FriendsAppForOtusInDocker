@@ -9,12 +9,19 @@ ENV ASPNETCORE_URLS=http://+:5000
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
+FROM node:current-alpine3.14 AS node_with_ts
+RUN npm install -g typescriptйя
+
+FROM node_with_ts AS ts_build
+WORKDIR /src
+COPY webapp . 
+RUN tsc --project tsconfig.json
+
 FROM mcr.microsoft.com/dotnet/sdk:5.0-focal AS build
 WORKDIR /src
 COPY ["webapp/FriendsAppNoORM.csproj", "./"]
 RUN dotnet restore "FriendsAppNoORM.csproj"
-COPY webapp .    
-WORKDIR "/src/."
+COPY --from=ts_build ./src .
 RUN dotnet build "FriendsAppNoORM.csproj" -c Release -o /app/build
 
 FROM build AS publish

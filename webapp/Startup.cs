@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FriendsAppNoORM.Data;
+using FriendsAppNoORM.Hubs;
 using FriendsAppNoORM.Models;
 using FriendsAppNoORM.Utilities;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -44,6 +41,7 @@ namespace FriendsAppNoORM
                 options.Filters.Add(new ProfileRequiredAuthorizationFilter());
             });
 
+            services.AddSignalR();
         }
 
         public void AddApplicationDatabaseContext(IServiceCollection services)
@@ -57,9 +55,11 @@ namespace FriendsAppNoORM
         {
             app.UseDeveloperExceptionPage();
             app.UseHsts();
-            
-            
+
+
             app.UseHttpsRedirection();
+
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -72,14 +72,19 @@ namespace FriendsAppNoORM
             });
 
             app.UseEndpoints(endpoints =>
-            {                
+            {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-               
+
                 endpoints.MapControllers();
 
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("/hub");
             });
         }
     }
